@@ -669,7 +669,7 @@
 <script src="{% static "assets/js/DataTables/datatables.js" %}"></script>
 <script>
 
-	showLoader();
+	{% comment %} showLoader(); {% endcomment %}
 		fetch("{% url 'taskchart' %}")
 		.then(res => res.json())
 		.then(data => {
