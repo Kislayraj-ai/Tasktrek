@@ -80,3 +80,28 @@ A comprehensive task management web application built with **Python Django 5** a
    ```bash
    git clone https://github.com/yourusername/taskmanagement.git
    cd taskmanagement
+
+
+
+
+Check some images below to understand the UI and workflow of the project.
+
+### 🖥️ Dashboard View
+![Dashboard](static/screenshots/ss2.png)
+![Dashboard](static/screenshots/ss3.png)
+
+### 📋 Project List
+![Project List](static/screenshots/ss6.png)
+
+
+### ✅ Task List
+![Task List](static/screenshots/ss5.png)
+
+### 🔔 Notification / Inbox
+![Notifications](static/screenshots/ss4.png)
+
+### 👤 User Profile & Settings
+![User Profile](static/screenshots/ss7.png)
+
+### Loader
+![Loader](static/screenshots/ss1.png)
