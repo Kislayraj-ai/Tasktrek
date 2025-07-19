@@ -2,12 +2,7 @@
 
 A comprehensive task management web application built with **Python Django 5** and **MySQL**, designed for Admins, Managers, and Users to collaborate efficiently. The system provides project assignment, task tracking, email notifications, user roles, and much more.
 
----
 
-![Task Management System Screenshot](project-screenshot.png)  
-*Check the image above for a glimpse of the UI.*
-
----
 
 ## 🚀 Features
 
