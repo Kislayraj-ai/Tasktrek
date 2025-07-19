@@ -1,0 +1,204 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}User List{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>User List</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+                    <div class="table-responsive">
+                        <table class="table" id="usertable">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Type</th>
+                                    <th>Action</th>
+                                    {% comment %} <td>Action</td> {% endcomment %}
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <tbody></tbody>
+                    </div>    
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <input type='hidden'  id='modaluserid'  value='' />
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Change Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="user_id">
+        <div class="mb-3">
+          <label for="new_password" class="form-label">New Password</label>
+          <input type="password" class="form-control" id="new_password">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" id='changepasswordModel'>Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% comment %} scripts here {% endcomment %}
+
+
+<!-- myss script -->
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(() => {
+        // $('#usertable').DataTable();
+        let userTable = $('#usertable').DataTable() ;
+
+        function loadUsers() {
+            $.ajax({
+                url: "{% url 'fetch_users' %}",
+                type: 'GET',
+                success: function (data) {
+
+                    if (userTable !== null) {
+                        userTable.destroy();
+                        $('#usertable tbody').empty();
+                    }
+                    userTable = $('#usertable').DataTable({
+                        data: data.data,
+                        order: [[1, 'desc']],
+                        columns: [
+                            {
+                                data: 'username', 
+                                render: function(data, type, row, meta) {
+                                    if (row.image && row.image !== 'N/A') {
+                                    return `<img src="${row.image}" alt="Profile" width="40" height="40" style="border-radius: 50%;" />${data}`;
+                                    } else {
+                                    return `<img src="/static/Image/user.png" alt="No Image" width="40" height="40" style="border-radius: 50%;" />${data}`;
+                                    }
+                                }
+                            },
+                            { data: 'userid' , 
+                                render : function(data , type , row){
+                                    return `${row.first_name} ${row.last_name}`
+                                }
+                             },
+                            { data: 'email' },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return row.role ?? 'N/A'
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    let editurl = `/dashboard/edit-user/${row.userid}/`
+                                
+                                    return `
+                                        <div class="d-flex gap-1 align-item-center">
+                                            <a href='${editurl}' class="btn btn-info btn-sm"><i class='fa fa-edit'></i> Edit</a>
+                                              <button type="button" class="btn btn-dark btn-sm" id='changepassword'
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#changePasswordModal"
+                                                    data-userid='${row.userid}'
+                                                >
+                                                    Change Password
+                                                </button>
+                                        </div>
+                                    `
+                                }
+                            }
+                        ]
+                    });
+
+                    
+
+                    $(document).on('click', '#changepassword', (e) => {
+                        let userid = $(e.target).data('userid');
+                        //console.log("getuserid " , userid)
+
+                                $(document).on('click', '#changepasswordModel', (e) => {
+
+
+                                    const new_password = $('#new_password').val();
+
+                                    if (!new_password) {
+                                        alert("Password cannot be empty!");
+                                        return;
+                                    }
+
+                                    fetch(`{% url "chageUserPassword" %}`, {  
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        body: JSON.stringify({
+                                            user_id: userid,
+                                            password: new_password
+                                        })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            alert("Password changed successfully!");
+                                            $('#new_password').val('');
+                                            const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                                            modal.hide();
+                                        } else {
+                                            alert("Failed: " + data.message);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        alert("Something went wrong!");
+                                    });
+                                });
+
+                    })
+
+
+
+                },
+                error: function () {
+                    alert("Failed to load users");
+                }
+            });
+        }
+
+        loadUsers()
+    });
+</script>
+
+{% endblock %}

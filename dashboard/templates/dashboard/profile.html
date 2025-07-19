@@ -1,0 +1,253 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}Profile Details{% endblock %}
+
+{% block 'content' %}
+<div id="content">
+    <div class="profile">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-header-cover"></div>
+            <div class="profile-header-content">
+                <div class="profile-header-img">
+                    <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'Image/user.png' %}{% endif %}" 
+                    alt="Profile Picture">
+                </div>
+                <h3 class="profile-header-name">{{ user.username }}</h3>
+                <p class="profile-header-text">{{ user.first_name }} {{ user.last_name}}</p>
+            </div>
+        </div>
+
+        <!-- Profile Details Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">My Profile</h4>
+                <div>
+                    <button id="changePasswordBtn" class="btn btn-warning btn-sm me-2">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                    <button id="editProfileBtn" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" readonly id="usernameField">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="{{ user.get_full_name }}" readonly id="fullnameField">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="{{ user.email }}" readonly id="emailField">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="phone" class="form-control" value="{{ user.profile.phone }}" readonly id="phoneField">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-control" value="{{ user.myuserrole.role.name }}" readonly id="roleField">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Profile</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="profileForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone" value="{{ user.profile.phone }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Profile Img</label>
+                        <input type="file" class="form-control" name="image" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="passwordForm" >
+
+                <div class="modal-body">
+
+                    <p class='alert' id='passwordchangesmessage' style="display:none;" >  </p>
+
+                    <div class="mb-3">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" class="form-control" name="current_password" id="current_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control" name="new_password" id="new_password"  required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" name="confirm_password" id="confirmPassword" required>
+                        <div class="invalid-feedback" id="passwordError">Passwords do not match</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id='changepasswordmodelbtn'>Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
+    document.getElementById('editProfileBtn').addEventListener('click', function() {
+        var modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+        modal.show();
+    });
+    
+    document.getElementById('changePasswordBtn').addEventListener('click', function() {
+        var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+        modal.show();
+    });
+    
+
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirmPassword');
+    const passwordError = document.getElementById('passwordError');
+    
+    function validatePassword() {
+        if (newPassword.value !== confirmPassword.value) {
+            confirmPassword.classList.add('is-invalid');
+            passwordError.style.display = 'block';
+            return false;
+        } else {
+            confirmPassword.classList.remove('is-invalid');
+            passwordError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    confirmPassword.addEventListener('input', validatePassword);
+    newPassword.addEventListener('input', validatePassword);
+    
+
+
+
+    $(document).on('click' , ' #changepasswordmodelbtn' , (e)=>{
+        e.preventDefault();
+
+        if (!validatePassword()) {
+            e.preventDefault();
+            return;
+        }
+
+        const token  = "{{csrf_token}}"
+        const newpassword =  $('#new_password').val()
+        const currentpassword =  $('#current_password').val()
+
+        $.ajax({
+            url : "{% url "changepersonalpassword" %}" ,
+            type : "POST" ,
+            data :{
+                csrfmiddlewaretoken : token ,
+                newpassword ,  currentpassword
+            },
+            success : (data) =>{
+                if(data.success){
+                    $('#passwordchangesmessage')
+                    .removeClass('alert-danger')
+                    .addClass('alert-success')
+                    .text(data.msg)
+                    .show();
+
+                    setTimeout(() =>{
+                        location.reload()
+                    } , 2000)
+
+                }else{
+                    $('#passwordchangesmessage')
+                    .removeClass('alert-success')
+                    .addClass('alert-danger')
+                    .text(data.msg)
+                    .show();
+
+                    return ;
+
+                }
+
+            }
+        })
+
+    })
+
+});
+</script>
+
+<style>
+.profile-header-cover {
+    height: 150px;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    border-radius: 4px 4px 0 0;
+}
+.profile-header-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: -50px auto 10px;
+    border: 3px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.profile-header-name {
+    text-align: center;
+    font-weight: 600;
+}
+</style>
+{% endblock %}

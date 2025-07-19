@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Mirrored from seantheme.com/studio-django/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 03 Jul 2025 13:06:17 GMT -->
+<head>
+	<meta charset="utf-8">
+	<title>Studio Django |  {% block 'title' %}{% endblock  %}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	
+	<!-- ================== BEGIN core-css ================== -->
+	<link href="{% static 'assets/css/vendor.min.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet">
+	<!-- ================== END core-css ================== -->
+	<link rel="stylesheet" href="{% static "assets/js/DataTables/datatables.css" %}">
+	
+</head>
+<body>
+
+<!-- BEGIN #app -->
+	<div id="app" class="app">
+
+
+		<span class="loader" style="display: none;"></span>
+		<!-- BEGIN #header -->
+		<div id="header" class="app-header">
+			<!-- BEGIN mobile-toggler -->
+			<div class="mobile-toggler">
+				<button type="button" class="menu-toggler" data-toggle="sidebar-mobile">
+					<span class="bar"></span>
+					<span class="bar"></span>
+				</button>
+			</div>
+			<!-- END mobile-toggler -->
+			
+			<!-- BEGIN brand -->
+			<div class="brand">
+				<div class="desktop-toggler">
+					<button type="button" class="menu-toggler" data-toggle="sidebar-minify">
+						<span class="bar"></span>
+						<span class="bar"></span>
+					</button>
+				</div>
+				
+			<a href="{% url 'home_page' %}" class="navbar-brand d-flex align-items-center">
+				<img src="{% static 'Image/logo1.png' %}" 
+					alt="TaskTrek Logo" 
+					class="img-fluid" 
+					
+					style="max-height: 45px; width: 90px;">
+			</a>
+
+			</div>
+			<!-- END brand -->
+			
+			<!-- BEGIN menu -->
+			<div class="menu">
+				<form class="menu-search" method="POST" name="header_search_form">
+
+				</form>
+				<div class="menu-item dropdown">
+					<a href="#" data-bs-toggle="dropdown" data-display="static" class="menu-link">
+						<div class="menu-icon"><i class="fa fa-bell nav-icon"></i></div>
+						<div class="menu-label">{{ user.notification_set.count }}</div>
+					</a>
+
+					<div class="dropdown-menu dropdown-menu-end dropdown-notification">
+						<h6 class="dropdown-header text-body-emphasis mb-1">Notifications</h6>
+				
+
+						{% for notify in user.notification_set.all|slice:"5" %}
+							<a href="#" class="dropdown-notification-item">
+								<div class="dropdown-notification-icon">
+									<i class="fa fa-receipt fa-lg fa-fw text-success"></i>
+								</div>
+								<div class="dropdown-notification-info">
+									<div class="title">
+										{{ user.id}}
+										{{notify.title}}
+									</div>
+									<div class="time">just now</div>
+								</div>
+								<div class="dropdown-notification-arrow">
+									<i class="fa fa-chevron-right"></i>
+								</div>
+							</a>
+
+						{% endfor %}
+			
+				
+						<div class="p-2 text-center mb-n1">
+							<a href="{% url "emailbox" %}" class="text-body-emphasis text-opacity-50 text-decoration-none">See all</a>
+						</div>
+					</div>
+
+
+				</div>
+				<div class="menu-item dropdown">
+					<a href="#" data-bs-toggle="dropdown" data-display="static" class="menu-link">
+						<div class="menu-img online">
+							{% if user.profile.image %}
+								<img src="{{user.profile.image.url}}" alt="" class="ms-100 mh-100 rounded-circle">
+							{% else %}
+								<img src="{% static "Image/user.png" %}" alt="" class="ms-100 mh-100 rounded-circle">
+							{% endif %}
+							
+						</div>
+						<div class="menu-text"><span class="__cf_email__" data-cfemail="13797c7b7d607e7a677b53606766777a7c3d707c7e">{{ user.username|capfirst }}</span></div>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end me-lg-3">
+						<a class="dropdown-item d-flex align-items-center" href="{% url "profile_view" %}">Edit Profile <i class="fa fa-user-circle fa-fw ms-auto text-body text-opacity-50"></i></a>
+						<a class="dropdown-item d-flex align-items-center" href="{% url "emailbox" %}">Inbox <i class="fa fa-envelope fa-fw ms-auto text-body text-opacity-50"></i></a>
+						{% comment %} <a class="dropdown-item d-flex align-items-center" href="calendar.html">Calendar <i class="fa fa-calendar-alt fa-fw ms-auto text-body text-opacity-50"></i></a>
+						<a class="dropdown-item d-flex align-items-center" href="settings.html">Setting <i class="fa fa-wrench fa-fw ms-auto text-body text-opacity-50"></i></a> {% endcomment %}
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item d-flex align-items-center" href="{% url "logoutuser" %}">Log Out 
+							<i class="fa fa-toggle-off fa-fw ms-auto text-body text-opacity-50"></i></a>
+					</div>
+				</div>
+			</div>
+			<!-- END menu -->
+		</div>
+		<!-- END #header -->
+		
+		<!-- BEGIN #sidebar -->
+			{% include "dashboard/layout/sidebar.html" %}
+		<!-- END #sidebar -->
+		
+
+        {% comment %} actual content {% endcomment %}
+        <div id="content" class="app-content">
+                {% block 'content' %}{% endblock  %}
+        </div>
+
+
+    </div>
+
+
+	<!-- END #app -->
+
+<!-- ================== BEGIN core-js ================== -->
+	{% comment %} <script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/js/vendor.min.js" type="77ff6f92e9a081abfbbfabef-text/javascript"></script>
+	<script src="{% static 'assets/js/app.min.js' %}" type="77ff6f92e9a081abfbbfabef-text/javascript"></script> {% endcomment %}
+    
+	<script src="{% static 'assets/js/vendor.min.js' %}"></script>
+    <script src="{% static 'assets/js/app.min.js' %}"></script>
+    {% comment %} <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script> {% endcomment %}
+	<!-- ================== END core-js ================== -->
+	
+	<!-- ================== BEGIN page-js ================== -->
+	<script src="{% static 'assets/plugins/apexcharts/dist/apexcharts.min.js' %}" type="77ff6f92e9a081abfbbfabef-text/javascript"></script>
+	<script src="{% static 'assets/js/demo/dashboard.demo.js' %}" type="77ff6f92e9a081abfbbfabef-text/javascript"></script>
+	<!-- ================== END page-js ================== -->
+	
+	
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3Q0VGQKY3" type="77ff6f92e9a081abfbbfabef-text/javascript"></script>
+	<script type="77ff6f92e9a081abfbbfabef-text/javascript">
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-Y3Q0VGQKY3');
+	</script>
+
+<!-- Google Analytics Code -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6KZ93349XS" type="77ff6f92e9a081abfbbfabef-text/javascript"></script>
+<script type="77ff6f92e9a081abfbbfabef-text/javascript">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-6KZ93349XS");
+</script>
+
+<script src="{% static "assets/js/DataTables/datatables.js" %}"></script>
+
+<link href="{% static 'select2/dist/css/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'select2/dist/js/select2.min.js' %}"></script>
+
+{% comment %} <script src="../cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="77ff6f92e9a081abfbbfabef-|49" defer></script><script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9596997a599355de","version":"2025.6.2","r":1,"serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"token":"4db8c6ef997743fda032d4f73cfeff63","b":1}' crossorigin="anonymous"></script> {% endcomment %}
+
+
+<style>
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0.3)); /* Transparent blocking */
+  backdrop-filter: blur(2px); /* Optional: subtle blur effect */
+  cursor: not-allowed; /* Prevent clicks visually */
+  pointer-events: all; /* Ensure it blocks clicks below */
+}
+
+.loader::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: black;
+  width: 64px;
+  height: 32px;
+  border-radius: 0 0 50px 50px;
+  animation: move 0.5s linear infinite alternate;
+  z-index: 999999;
+}
+
+.loader::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  background: #FF3D00;
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%) rotate(0deg);
+  animation: rotate 2s linear infinite;
+  z-index: 999999;
+}
+
+/* Optional keyframe animations */
+@keyframes move {
+  from {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  to {
+    transform: translate(-50%, -50%) translateY(5px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+</style>
+
+<script>
+  function toggleLoader(action) {
+    if (action === "show") {
+      $(".loader").show();
+    } else if (action === "hide") {
+      $(".loader").hide();
+    }
+  }
+</script>
+{% comment %} {% include "dashboard/layout/footers.html" %} {% endcomment %}
+</body>
+
+<!-- Mirrored from seantheme.com/studio-django/ by HTTrack Website Copier/3.x [XR&CO'2014], Thu, 03 Jul 2025 13:07:12 GMT -->
+</html>

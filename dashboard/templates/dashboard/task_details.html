@@ -1,0 +1,175 @@
+{% extends "dashboard/layout/main.html" %}
+
+{% load static %}
+{% block 'title' %}Task Details{% endblock %}
+
+{% block 'content' %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <h4>Task Details</h4>   
+                    <div>
+                        <span class="badge bg-{% if task.priority == 'LW' %}info
+                                             {% elif task.priority == 'MM' %}warning
+                                             {% elif task.priority == 'HH' %}danger
+                                             {% elif task.priority == 'CL' %}dark
+                                             {% endif %}">
+                            {{ task.get_priority_display }}
+                        </span>
+                        <span class="badge bg-{% if task.status == 'in_progress' %}primary
+                                            {% elif task.status == 'hold' %}secondary
+                                            {% comment %} {% elif task.status == 'in_qa' %}info {% endcomment %}
+                                            {% elif task.status == 'completed' %}success
+                                            {% endif %} ms-2">
+                            {{ task.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>{{ task.name }} </h3>
+                            {% comment %} <p class="text-muted">Assigned to : {{ task.user.username|capfirst }} </p> {% endcomment %}
+                            <div class="mt-4">
+                                <h6>Description</h6>
+                                <div class="border p-3 rounded bg-light">
+                                    {{ task.description|linebreaks }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Task Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Created:</span>
+                                            <span>{{ task.created_at|date:"M d, Y H:i" }}</span>
+                                        </li>
+                                        {% comment %} <li class="list-group-item d-flex justify-content-between">
+                                            <span>Deadline:</span>
+                                            <span class="{% if task.is_overdue %}text-danger{% endif %}">
+                                                {{ task.deadline|date:"M d, Y H:i"|default:"Not set" }}
+                                            </span>
+                                        </li> {% endcomment %}
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Assigned To:</span>
+                                            <span>{{ task.user.username|capfirst }}</span>
+
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>Project:</span>
+                                            <span>{{ task.project.name }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+                    <!-- Comments Section -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                                                            
+                            {% if  messages %}
+                                {% for m  in messages %}
+                                    {% if m.tags == 'error' %}
+                                        <div class="alert alert-danger mt-2">
+                                    {% else  %}
+                                        <div class="alert alert-{{ m.tags }} mt-2">
+                                    {% endif %}
+                                            {{m}}
+                                        </div>
+                                {% endfor %}
+                            {% endif %}
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Comments</h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Comment Form -->
+                                    <form method="post" action="{% url "submit_comment" %}" enctype="multipart/form-data" >
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{taskid}}" name="taskid" />
+                                        <div class="mb-3">
+                                            <textarea class="form-control" name="comment" rows="3" placeholder="Add a comment..." required></textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="commentFile" class="form-label">Attach file</label>
+                                            <input class="form-control" type="file" name="file" id="commentFile">
+                                        </div>
+                                        <div class="row">
+
+                                            <div class="col text-end">
+                                                <button type="submit" class="btn btn-primary">Post Comment</button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <hr>
+
+                                    <!-- Comments List -->
+                                    <div class="mt-4">
+                                        {% for comment in comments %}
+
+                                        <div class="d-flex mb-4">
+                                           <div class="flex-shrink-0">
+                                                <div class="avatar-initials rounded-circle d-flex align-items-center justify-content-center" 
+                                                    style="width: 50px; height: 50px; background-color: #{{ comment.task.user.id|stringformat:'06x'|slice:'-6:'|truncatechars:6 }}; color: white; font-weight: bold;">
+                                                    {{ comment.task.user.username|slice:":2"|upper }}
+                                                </div>
+                                            </div>
+                                            <div class="ms-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <h6 class="fw-bold mb-1">{{ comment.task.user.username }}</h6>
+                                                    <small class="text-muted">{{ comment.created_at|timesince }} ago</small>
+                                                </div>
+                                                <p class="mb-1">{{ comment.comment_text }}</p>
+                                                {% if comment.doc_file %}
+                                                <div class="mt-2">
+                                                    <a href="{{ comment.doc_file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-paperclip me-1"></i> {{ comment.doc_file.name|slice:"25:" }}
+                                                    </a>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <p class="text-muted">No comments yet.</p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-header {
+        padding: 1rem 1.5rem;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        font-size: 0.85em;
+        padding: 0.35em 0.65em;
+    }
+    .comment-box {
+        border-left: 3px solid #dee2e6;
+        padding-left: 1rem;
+    }
+</style>
+{% endblock %}

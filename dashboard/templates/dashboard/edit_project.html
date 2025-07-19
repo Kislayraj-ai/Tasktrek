@@ -1,0 +1,85 @@
+{% extends "dashboard/layout/main.html" %}
+
+{% block 'title' %}Dashboard{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Edit Project</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+
+                 <form  method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" placeholder="Enter Name" name="name" value="{{pro.name}}" required />
+                        </div>
+                        
+                        <div class="col-6 mt-2">
+                            <label for="manager">Maanger</label>
+                            <select name="manager" class="form-select" >
+                                {% for r in manager  %}
+                                    <option value="{{r.id}}"  {% if pro.manager.id == r.id %}selected{% endif %}  >{{ r.username }}</option>
+                                {% endfor %}
+
+                            </select>
+                            
+                        </div>   
+
+                        <div class="col-6  mt-2">
+                            <label for="details">Details</label>
+                            <textarea  class='form-control' name="details" id="details" required row="3">{{pro.details}}</textarea>
+                        </div>
+
+                        
+                        <div class="col-6 mt-2">
+                            <label for="deadline">Deadline</label>
+                            <input type="date" name="deadline" id="deadline" class="form-control" value="{{ pro.deadline|date:'Y-m-d' }}" required>
+                        </div>
+
+                        <div class="col-6 mt-2">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="IP" {% if pro.status == 'IP'  %}selected{% endif %}>InProgress</option>
+                                <option value="CP" {% if pro.status == 'CP'  %}selected{% endif %}>Completed</option>
+                                <option value="HD" {% if pro.status == 'HD'  %}selected{% endif %}>Hold</option>
+                            </select>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">update</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

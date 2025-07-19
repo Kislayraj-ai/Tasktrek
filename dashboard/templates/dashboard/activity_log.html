@@ -1,0 +1,106 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}User List{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Activity Log</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+                    <div class="table-responsive">
+                        <table class="table" id="usertable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>User</th>
+                                    <th>User Type</th>
+                                    <th>Description</th>
+                                    <th>Created On</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <tbody></tbody>
+                    </div>    
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+
+
+{% comment %} scripts here {% endcomment %}
+
+
+<!-- myss script -->
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(() => {
+        // $('#usertable').DataTable();
+        let userTable = $('#usertable').DataTable() ;
+
+        function loadUsers() {
+            $.ajax({
+                url: "{% url 'fetch_activity_log' %}",
+                type: 'GET',
+                success: function (data) {
+
+                    if (userTable !== null) {
+                        userTable.destroy();
+                        $('#usertable tbody').empty();
+                    }
+                    userTable = $('#usertable').DataTable({
+                        data: data.data,
+                        order: [[1, 'desc']],
+                        columns: [
+                        
+                            {
+                                data: 'title'
+                            },
+                            { data: 'user'
+                             },
+                            { data: 'usertype' },
+
+                            {
+                                data: 'description'
+                            },
+                            {
+                                data: 'created_at'
+                            },
+                          
+                        ]
+                    });
+
+                },
+                error: function () {
+                    alert("Failed to load users");
+                }
+            });
+        }
+
+        loadUsers()
+    });
+</script>
+
+{% endblock %}

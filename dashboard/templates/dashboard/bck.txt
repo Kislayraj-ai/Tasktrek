@@ -1,0 +1,64 @@
+{% extends "dashboard/layout/main.html" %}
+
+{% block 'title' %}Dashboard{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Create User</h1>
+             </div>
+            <div class="card-body p-5">
+                 <form action="{% url "submituserdata" %}" method="POST">
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label for="">Name</label>
+                            <input type="text" class="form-control" placeholder="Name" name="name"  required />
+                        </div>
+
+                        <div class="col-6 mt-2">
+                            <label for="">Manager</label>
+                            <input type="text" class="form-control" placeholder="Maanger"    required />
+                        </div>
+
+                        <div class="col-6  mt-2">
+                            <label for="">Members</label>
+                            <input type="text" class="form-control" placeholder="Member"   required />
+                        </div>
+
+                        <div class="col-6  mt-2">
+                            <label for="">Deadline</label>
+                            <input type="date" class="form-control" placeholder="Dealine"   name="deadline"  required />
+                        </div>
+
+                        <div class="col-6  mt-2">
+                            <label for="">Details</label>
+                            <textarea rows=4 class="form-control" placeholder="Details" name="Details"  required /></textarea>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

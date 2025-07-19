@@ -1,0 +1,129 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}Dashboard{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Edit User</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+
+                 <form class='mainform'  method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+
+                        <input type="hidden" name="userid"  value="{{user.id}}">
+
+                        <div class="col-md-6">
+                            <label for="name">Username</label>
+                            <input type="text" class="form-control" placeholder="Enter Name" name="name" value="{{user.username}}"  required />
+                        </div>
+
+                        <div class="col-6 mt-2">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" placeholder="Enter Email"  name="email"  value="{{user.email}}"  required />
+                        </div>
+
+                          <div class="row mt-3 p-0">
+
+                            <div class="col-md-6">
+                                <label for="name">First Name </label>
+                                <input type="text" class="form-control" placeholder="Enter First Name" name="first_name" value="{{user.first_name}}"   required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="name">Last Name </label>
+                                <input type="text" class="form-control" placeholder="Enter Last Name" name="last_name" value="{{user.last_name}}"   required />
+                            </div>
+
+                        </div>
+
+                        
+                        <div class="col-6  mt-2">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control"  name="phone" value="{{user.profile.phone}}"  placeholder="Enter Phone" / >
+                        </div>
+
+                        
+                        <div class="col-6 mt-2">
+                            <label for="type">Type</label>
+                            <select name="type" class="form-select" >
+                                {% for r in roles  %}
+                                    <option value="{{r.id}}"  {% if user.myuserrole.role.id == r.id %}selected{% endif %} >{{ r.name }}</option>
+                                {% endfor %}
+
+                            </select>
+                            
+                        </div>   
+
+                        
+                            <div class="col-12 mt-2">
+                                <div class="image-container text-start mb-2">
+                                    {% if user.profile.image %}
+                                        <img src="{{ user.profile.image.url }}" alt="Profile Image" style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ccc;">
+                                    {% else %}
+                                        <p>No image uploaded</p>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-6 mt-2">
+                                    <label for="image">Profile Img</label>
+                                    <input type="file" class="form-control" name="image">
+                                </div>
+                        </div>
+
+
+                        {% comment %} <div class="col-6  mt-2">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" placeholder="Enter Password" name="password"   required />
+                        </div> {% endcomment %}
+
+                        <div class="row mt-3">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    
+  $(document).on('submit', '.mainform', function(e) {
+    e.preventDefault();
+    toggleLoader("show");
+
+    setTimeout(() => {
+      $(".mainform")[0].submit();
+    }, 2000);
+  });
+
+</script>
+
+
+{% endblock %}

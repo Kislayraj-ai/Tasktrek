@@ -1,0 +1,27 @@
+# === Python / Django ===
+env/
+venv/
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+*.log
+*.pot
+
+# Environment Variables
+.env
+
+# === Node / Vite ===
+node_modules/
+dist/
+.vite/
+build/
+*.tsbuildinfo
+
+# === Editors & OS ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

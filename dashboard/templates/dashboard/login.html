@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TaskTrek</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --primary-dark: #3a5a8a;
+            --studio-bg: #f8f9fa;
+        }
+        
+        body {
+            background-color: var(--studio-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .login-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 450px;
+        }
+        
+        .login-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .btn-studio {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+        }
+        
+        .btn-studio:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(74, 111, 165, 0.25);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="card login-card mx-auto">
+            <div class="login-header">
+                <h2 class="mb-0"><img src="{% static 'Image/logo1.png' %}" 
+					alt="TaskTrek Logo" 
+					class="img-fluid" 
+					
+					style="max-height: 45px; width: 90px;">
+                <br>
+                TaskTrek - Login
+                </h2>
+
+            </div>
+            
+            <div class="login-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> Please enter a correct username and password. 
+                        Note that both fields may be case-sensitive.
+                    </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'loginpage' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Username</label>
+                        <input type="text" 
+                               name="username" 
+                               id="id_username" 
+                               class="form-control form-control-lg" 
+                               required 
+                               autofocus
+                               value="{% if form.username.value %}{{ form.username.value }}{% endif %}">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">Password</label>
+                        <input type="password" 
+                               name="password" 
+                               id="id_password" 
+                               class="form-control form-control-lg" 
+                               required>
+                    </div>
+                    
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-studio btn-lg">Login</button>
+                    </div>
+                    
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

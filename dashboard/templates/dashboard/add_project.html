@@ -1,0 +1,100 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}Dashboard{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Add Project</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+
+                 <form action="{% url "submitProject" %}" method="POST" class="mainform">
+                    {% csrf_token %}
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" placeholder="Enter Name" name="name"  required />
+                        </div>
+                        
+                        <div class="col-6 mt-2">
+                            <label for="manager">Maanger</label>
+                            <select name="manager" class="form-select" >
+                                {% for r in manager  %}
+                                    <option value="{{r.id}}">{{ r.username }}</option>
+                                {% endfor %}
+
+                            </select>
+                            
+                        </div>   
+
+                        <div class="col-6  mt-2">
+                            <label for="details">Details</label>
+                            <textarea  class='form-control' name="details" id="details" required row="3"></textarea>
+                        </div>
+
+                        
+                        <div class="col-6  mt-2">
+                            <label for="deadline">Deadline</label>
+                            <input type="date" name="deadline" id="deadline" class="form-control" required >
+                        </div>
+                        
+                        <div class="col-6 mt-2">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="IP">InProgress</option>
+                                <option value="CP">Completed</option>
+                                <option value="HD">Hold</option>
+                            </select>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    
+  $(document).on('submit', '.mainform', function(e) {
+    e.preventDefault();
+    toggleLoader("show");
+
+    setTimeout(() => {
+      $(".mainform")[0].submit();
+    }, 2000);
+  });
+
+</script>
+
+
+{% endblock %}

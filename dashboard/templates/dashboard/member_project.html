@@ -1,0 +1,257 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}Project List{% endblock  %}
+
+
+{% block  'content' %}
+
+<style>
+
+.badge {
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.375rem;
+}
+
+.badge-success {
+  background-color: #198754;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+</style>
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>My Project</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+                    <div class="table-responsive">
+                        <table class="table" id="projectTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Manager</th>
+                                    <th>Details</th>
+                                    <th>Deadline</th>
+                                </tr>
+                            </thead>
+                        </table>
+
+                        <tbody></tbody>
+                    </div>    
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+
+
+</div>
+
+
+{% comment %} scripts here {% endcomment %}
+
+
+<!-- myss script -->
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(() => {
+
+        let projectTable = $('#projectTable').DataTable() ;
+
+        function loadUsers() {
+            $.ajax({
+                url: "{% url 'fetch_member_project' %}",
+                type: 'GET',
+                success: function (data) {
+                   // console.log(data)
+                    if (projectTable !== null) {
+                        projectTable.destroy();
+                        $('#projectTable tbody').empty();
+                    }
+                    projectTable = $('#projectTable').DataTable({
+                        data: data,
+                        columns: [
+                            { data: null ,
+                                render : function(data, type , row){
+                                    let url = `/dashboard/project-details/${row.id}`
+                                    return `
+                                            <a href='${url}' class='link'>${data.name}</a>
+                                    `
+                                }
+                            },
+                            { data: 'manager' },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return row.details ?? 'N/A'
+                                }
+                            },
+                            {
+                                    data: null,
+                                    render: function (data, type, row) {
+                                    if (!row.deadline) {
+                                        return 'N/A';
+                                    }
+
+                                    const badgeClass = row.due_status ? 'badge-success' : 'badge-warning';
+
+                                    return `
+                                        ${row.deadline}
+                                        <span class="badge ${badgeClass}">
+                                            (${row.due_by ?? 'N/A'})
+                                        </span>
+                                    `;
+                                }
+                            }
+
+                            {% if user.myuserrole.role.id == 1 or user.myuserrole.role.id == 2 %}
+                                ,{
+                                    data: null,
+                                    render: function(data, type, row) {
+
+                                        const currentStatus = row.statusShort || '';
+                                        console.log("status " , row.status)
+                                        
+                                        return `
+                                            <select name="status" class="form-control status-select" data-row-id="${row.id}">
+                                                <option value="IP" ${currentStatus === 'IP' ? 'selected' : ''}>In Progress</option>
+                                                <option value="CP" ${currentStatus === 'CP' ? 'selected' : ''}>Completed</option>
+                                                <option value="HD" ${currentStatus === 'HD' ? 'selected' : ''}>Hold</option>
+                                            </select>
+                                        `;
+                                    }
+                                }
+                            {% endif %}
+
+                        {% if user.myuserrole.role.id == 1 %}
+                        ,{
+                            data: null,
+                            render: function(data, type, row) {
+                                let editurl = `/dashboard/edit-project/${row.id}/`;
+                                return `
+                                    <div class="d-flex gap-1 align-item-center">
+                                        <a href='${editurl}' class="btn btn-info btn-sm">
+                                            <i class='fa fa-edit'></i> Edit
+                                        </a>
+                                    </div>
+                                `;
+                            }
+                        }
+                        {% endif %}
+                        ]
+                    });
+
+                    
+
+                    $(document).on('click', '#changepassword', (e) => {
+                        let userid = $(e.target).data('userid');
+                        //console.log("getuserid " , userid)
+
+                                $(document).on('click', '#changepasswordModel', (e) => {
+                                    const new_password = $('#new_password').val();
+
+                                    if (!new_password) {
+                                        alert("Password cannot be empty!");
+                                        return;
+                                    }
+
+                                    fetch(`{% url "chageUserPassword" %}`, {  
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRFToken': '{{ csrf_token }}'
+                                        },
+                                        body: JSON.stringify({
+                                            user_id: userid,
+                                            password: new_password
+                                        })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            alert("Password changed successfully!");
+                                            $('#new_password').val('');
+                                            const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                                            modal.hide();
+                                        } else {
+                                            alert("Failed: " + data.message);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                        alert("Something went wrong!");
+                                    });
+                                });
+
+                    })
+
+                    // change the status of the project/
+                    $(document).on('change', '.status-select', function() {
+                        const rowId = $(this).data('row-id');
+                        const newStatus = $(this).val();
+                        const csrfToken = "{{ csrf_token }}";
+
+                        $.ajax({
+                            url: "{% url 'update_project_status' %}",
+                            method: 'POST',
+                            data: {
+                                id: rowId,
+                                status: newStatus ,
+                                csrfmiddlewaretoken: csrfToken ,
+                            },
+                            success: function(response) {
+                                if(response.success){
+                                    alert('Project Status Updated');
+                                    return
+                                }else{
+                                    alert('Status not updated');
+                                    return
+                                }
+                            },
+                            error: function(xhr) {
+                                alert('Some Error Occurred');
+                            }
+                        });
+                    });
+
+
+
+                },
+                error: function () {
+                    alert("Failed to load users");
+                }
+            });
+        }
+
+        loadUsers()
+    });
+</script>
+
+{% endblock %}

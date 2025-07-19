@@ -1,0 +1,236 @@
+{% comment %} {% extends "dashboard/layout/main.html" %}
+
+
+{% block  'sidebar' %} {% endcomment %}
+	    <div id="sidebar" class="app-sidebar">
+			<!-- BEGIN scrollbar -->
+			<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
+				<!-- BEGIN menu -->
+				<div class="menu">
+					<div class="menu-header">Navigation</div>
+					<div class="menu-item active">
+						<a href="{% url "home_page" %}" class="menu-link">
+							<span class="menu-icon"><i class="fa fa-laptop"></i></span>
+							<span class="menu-text">Dashboard</span>
+						</a>
+					</div>
+
+					{% comment %} <div class="menu-item">
+						<a href="analytics.html" class="menu-link">
+							<span class="menu-icon"><i class="fa fa-chart-pie"></i></span>
+							<span class="menu-text">Analytics</span>
+						</a>
+					</div> {% endcomment %}
+
+
+					{% if user.myuserrole.role.id == 1 or user.myuserrole.role.id == 2 %}
+						<div class="menu-item has-sub">
+							<a href="#" class="menu-link">
+								<span class="menu-icon">
+									<i class="fa fa-user"></i>
+								</span>
+								<span class="menu-text">Users</span>
+								<span class="menu-caret"><b class="caret"></b></span>
+							</a>
+							<div class="menu-submenu">
+								<div class="menu-item">
+									<a href="{% url "create_user" %}" class="menu-link">
+										<span class="menu-text">Add New</span>
+									</a>
+								</div>
+
+								<div class="menu-item">
+									<a href="{% url "users_list" %}" class="menu-link">
+										<span class="menu-text">List</span>
+									</a>
+								</div>
+								
+
+							</div>
+						</div>
+
+					{% endif %}
+
+
+					{% comment %} {% if user.myuserrole.role.id == 1 or user.myuserrole.role.id == 2 %} {% endcomment %}
+						{% if user.myuserrole.role.id == 1 or user.myuserrole.role.id == 2 %}	
+							<div class="menu-item has-sub">
+								<a href="#" class="menu-link">
+									<span class="menu-icon">
+										<i class="fa fa-project-diagram"></i>
+									</span>
+									<span class="menu-text">Project Management</span>
+									<span class="menu-caret"><b class="caret"></b></span>
+								</a>
+								<div class="menu-submenu">
+									{% if user.myuserrole.role.id == 1 %}
+										<div class="menu-item">
+											<a href="{% url "addNewProject" %}" class="menu-link">
+												<span class="menu-text">Add New</span>
+											</a>
+										</div>
+									{% endif %}
+
+									<div class="menu-item">
+										<a href="{% url "projectlist" %}" class="menu-link">
+											<span class="menu-text">List</span>
+										</a>
+									</div>
+
+									{% comment %} <div class="menu-item">
+										<a href="{% url "assign_member" %}" class="menu-link">
+											<span class="menu-text">Assign Member</span>
+										</a>
+									</div>
+									{% endcomment %}
+
+								</div>
+							</div>
+						{% endif %}
+					{% comment %} {% endif %} {% endcomment %}
+
+					{% comment %} project for the member  {% endcomment %}
+
+						{% if user.myuserrole.role.id == 3 %}
+
+							<div class="menu-item ">
+									<a href="{% url "member_project" %}" class="menu-link">
+										<span class="menu-icon"><i class="fa fa-project-diagram"></i></span>
+										<span class="menu-text">My Project</span>
+									</a>
+								</div>
+							
+						{% endif %}
+					{% comment %} end of project for the member {% endcomment %}
+
+					{% comment %} task management {% endcomment %}
+						<div class="menu-item has-sub">
+						<a href="#" class="menu-link">
+							<span class="menu-icon">
+								<i class="fa fa-tasks"></i>
+							</span>
+							<span class="menu-text">Task Management</span>
+							<span class="menu-caret"><b class="caret"></b></span>
+						</a>
+						<div class="menu-submenu">
+							<div class="menu-item">
+								<a href="{% url "add_new_task" %}" class="menu-link">
+									<span class="menu-text">Add Task</span>
+								</a>
+							</div>
+						</div>
+					</div>
+
+
+					{% comment %}end of task managemn  {% endcomment %}
+
+					{% comment %} <div class="menu-item has-sub">
+						<a href="#" class="menu-link">
+							<span class="menu-icon">
+								<i class="fa fa-envelope"></i>
+								<span class="menu-icon-label">6</span>
+							</span>
+							<span class="menu-text">Email</span>
+							<span class="menu-caret"><b class="caret"></b></span>
+						</a>
+						<div class="menu-submenu">
+							<div class="menu-item">
+								<a href="email_inbox.html" class="menu-link">
+									<span class="menu-text">Inbox</span>
+								</a>
+							</div>
+							<div class="menu-item">
+								<a href="email_compose.html" class="menu-link">
+									<span class="menu-text">Compose</span>
+								</a>
+							</div>
+							<div class="menu-item">
+								<a href="email_detail.html" class="menu-link">
+									<span class="menu-text">Detail</span>
+								</a>
+							</div>
+						</div>
+					</div> {% endcomment %}
+                    
+					<div class="menu-divider"></div>
+					<div class="menu-header">Components</div>
+
+						<div class="menu-item has-sub">
+							<a href="#" class="menu-link">
+								<span class="menu-icon">
+									<i class="fa fa-envelope"></i>
+								</span>
+								<span class="menu-text">Email</span>
+								<span class="menu-caret"><b class="caret"></b></span>
+							</a>
+							
+							<div class="menu-submenu">
+
+								<div class="menu-item">
+									<a href="{% url "emailbox" %}" class="menu-link">
+										<span class="menu-text">Inbox</span>
+									</a>
+								</div>
+
+								{% if user.myuserrole.role.id != 3 %}
+									<div class="menu-item">
+										<a href="{% url "email_compose" %}" class="menu-link">
+											<span class="menu-text">Compose</span>
+										</a>
+									</div>
+								{% endif %}
+							{% comment %} <div class="menu-item">
+								<a href="email_detail.html" class="menu-link">
+									<span class="menu-text">Detail</span>
+								</a>
+							</div> {% endcomment %}
+						</div>
+
+			
+						
+						{% comment %}! end of the component  {% endcomment %}
+					</div>
+
+
+						<div class="menu-item">
+							<a href="{% url "activity_log" %}" class="menu-link">
+								<span class="menu-icon">
+									<i class="fa fa-history"></i>
+								</span>
+								<span class="menu-text">Activity Log</span>
+							</a>
+						</div>
+
+
+					<div class="menu-divider"></div>
+					<div class="menu-header">Users</div>
+					<div class="menu-item">
+						<a href="{% url "profile_view" %}" class="menu-link">
+							<span class="menu-icon"><i class="fa fa-user-circle"></i></span>
+							<span class="menu-text">Profile</span>
+						</a>
+					</div>
+
+					{% comment %} <div class="menu-item">
+						<a href="settings.html" class="menu-link">
+							<span class="menu-icon"><i class="fa fa-cog"></i></span>
+							<span class="menu-text">Settings</span>
+						</a>
+					</div> {% endcomment %}
+
+					{% comment %} <div class="p-3 px-4 mt-auto hide-on-minified">
+						<a href="documentation/index.html" target="_blank" class="btn btn-secondary d-block w-100 fw-600 rounded-pill">
+							<i class="fa fa-code-branch me-1 ms-n1 opacity-5"></i> Documentation
+						</a>
+					</div> {% endcomment %}
+				</div>
+				<!-- END menu -->
+			</div>
+			<!-- END scrollbar -->
+			
+			<!-- BEGIN mobile-sidebar-backdrop -->
+			<button class="app-sidebar-mobile-backdrop" data-dismiss="sidebar-mobile"></button>
+			<!-- END mobile-sidebar-backdrop -->
+		</div>
+
+{% comment %} {% endblock  %} {% endcomment %}

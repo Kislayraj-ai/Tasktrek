@@ -1,0 +1,139 @@
+{% extends "dashboard/layout/main.html" %}
+
+{% load static %}
+{% block 'title' %}Assign Member{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Assign Member</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+
+                 <form  method="POST" action="{% url "assingmembersubmit" %}">
+                    {% csrf_token %}
+                    <div class="row">
+
+                        <div class="col-6 mt-2">
+                            <label for="manager">Maanger</label>
+                            <select name="manager" class="form-select" id='manager'>
+                                <option value=""  >Select Manager</option>
+                                {% for r in manager  %}
+                                    <option value="{{r.id}}"  {% if pro.manager.id == r.id %}selected{% endif %}  >{{ r.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>   
+                        
+                        <div class="col-6 mt-2">
+                            <label for="manager">Project</label>
+                            <select name="project_dropdown" class="form-select" id='project_dropdown' >
+                                <option value="">Select Project</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-6 mt-2">
+                            <label for="manager">User</label>
+                            <select name="user_dropdown" class="form-select" id='user_dropdown'  multiple>
+                            </select>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+
+
+<script>
+
+    $(document).ready(() =>{
+         let users  = $('#user_dropdown').select2();
+
+        const fetchProjectAndUsers = (getmanager=0)=> {
+              $.ajax({
+                url: "{% url 'fetch_project_users' %}",
+                type: 'GET',
+                data :{
+                    getmanager
+                },
+                success: function (data) {
+                  //  console.log(data)
+
+                    let projectdropdown =  $('#project_dropdown')
+
+                    data.projects.forEach((item) =>{
+                        projectdropdown.append(
+                            `
+                                <option value='${item.projectid}' >${item.name}</option>
+                            `
+                        )
+                    })
+
+                    data.users.forEach((item) =>{
+                        users.append(
+                            `
+                                <option value='${item.userid}' >${item.username}</option>
+                            `
+                        )
+
+                        users.select2()
+                    })
+
+
+
+                },
+                error: function () {
+                   // alert("Failed to load users");
+                }
+            });
+        }
+
+        $(document).on('change' , '#manager' , (e)=>{
+                let getmanager =  $(e.target).val()
+
+                  $('#project_dropdown').empty()
+                  $('#project_dropdown').append(
+                    `
+                    <option value='' >Select Project</option>
+                    `
+                  )
+                  $('#user_dropdown').empty()
+
+                fetchProjectAndUsers(parseInt(getmanager))
+        })
+
+        
+
+    })
+</script>
+
+{% endblock %}

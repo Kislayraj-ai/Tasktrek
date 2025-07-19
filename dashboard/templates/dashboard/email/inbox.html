@@ -1,0 +1,223 @@
+{% extends "dashboard/layout/main.html" %}
+{% comment %} {% extends "dashboard/layout/main.html" %} {% endcomment %}
+{% load static %}
+{% block 'title' %}Inbox{% endblock  %}
+
+
+{% block 'content' %}
+
+<style>
+.notificationread{
+    font-weight: bold;
+
+}
+.message-content{
+    cursor: pointer;
+}
+
+</style>
+
+        <div id="content" >
+			<div class="mailbox">
+
+				<div class="mailbox-toolbar">
+					<div class="mailbox-toolbar-item"><span class="mailbox-toolbar-text">Mailboxes</span></div>
+					<div class="mailbox-toolbar-item"><a  class="mailbox-toolbar-link active">Inbox</a></div>
+					{% comment %} <div class="mailbox-toolbar-item"><a href="email_inbox.html" class="mailbox-toolbar-link">Sent</a></div>
+					<div class="mailbox-toolbar-item"><a href="email_inbox.html" class="mailbox-toolbar-link">Drafts (1)</a></div>
+					<div class="mailbox-toolbar-item"><a href="email_inbox.html" class="mailbox-toolbar-link">Junk</a></div> {% endcomment %}
+
+                    {% if user.myuserrole.role.id != 3 %}
+					    <div class="mailbox-toolbar-item"><a href="{% url "email_compose" %}" class="mailbox-toolbar-link text-theme bg-theme bg-opacity-10">New Message <i class="fa fa-pen fs-12px ms-1"></i></a></div>
+                    {% endif %}
+                </div>
+
+				<div class="mailbox-body">
+					<div class="mailbox-sidebar">
+						<div data-scrollbar="true" data-height="100%" data-skip-mobile="true">
+
+                            {% comment %}here started the inbox notification  {% endcomment %}
+                            {% for notify in  data %}
+                                <div class="mailbox-list message-content" data-id='{{notify.id}}'>
+                                    <div class="mailbox-list-item unread has-attachment">
+                                            <div class="mailbox-message" >
+                                                <a  class="mailbox-list-item-link">
+                                                    <div class="mailbox-sender">
+                                                        <span class="mailbox mailbox-main-title{% if notify.is_read == False %}
+                                                            notificationread
+                                                        {% endif %}">{{notify.title}}</span>
+                                                        <span class="mailbox-time">{{ notify.created_at|timesince }} ago</span>
+                                                    </div>
+
+                                                    {% comment %} <div class="mailbox-title">{{ notify.detail }}</div> {% endcomment %}
+                                                    {% comment %} <div class="mailbox-desc">
+                                                        Praesent id pulvinar orci. Donec ac metus non ligula faucibus venenatis. Suspendisse tortor est, placerat eu dui sed...
+                                                    </div> {% endcomment %}
+
+                                                </a>
+                                            </div>
+
+                                    </div>
+
+                                </div>
+                            {% endfor %}
+
+                            
+						</div>
+					</div>
+
+
+
+					<div class="mailbox-content d-none d-lg-block" id="no_notification_selected" >
+						<div data-scrollbar="true" data-height="100%" data-skip-mobile="true">
+							<div class="mailbox-empty-message">
+								<div class="mailbox-empty-message-img"><img src="{% static "assets/img/page/email.svg" %}" alt=""></div>
+								<div class="mailbox-empty-message-title">No message selected</div>
+							</div>
+						</div>
+					</div>
+
+                    <div class="mailbox-content" style="display:none;" id="notification_content">
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+        $(document).ready(() =>{
+
+            $('.message-content').click(function(e) {
+                e.preventDefault();
+                const msgid = $(this).data('id');
+                const currElement = $(this);
+
+                // console.log($('#no_notification_selected').length); 
+                
+                $('#no_notification_selected').hide();
+                $('#no_notification_selected').addClass('d-none').removeClass('d-lg-block');
+
+                const notifyContent = $('#notification_content').show();
+                currElement.find('.mailbox-main-title')
+                    .removeClass('notificationread')
+                    .css({
+                        'font-weight': 'normal',
+                        'color': '#666'
+                    });
+
+                $.ajax({
+                    url: "{% url 'fetch_emai_inbox_detail' %}",
+                    type: "GET",
+                    data: { msgid },
+                    success: (data) => {
+                        if (data.success) {
+                            renderNotificationDetail(notifyContent, data.notify);
+                        } else {
+                            Swal.fire('Error', data.msg || 'Failed to load notification', 'error');
+                        }
+                    },
+                    error: (xhr) => {
+                        Swal.fire('Error', xhr.responseText || 'Request failed', 'error');
+                    }
+                });
+            });
+
+            // Separate function for rendering notification details
+            function renderNotificationDetail(container, notification) {
+                const date = new Date(notification.created_at);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const content = `
+                    <div data-scrollbar="true" data-height="100%" data-skip-mobile="true">
+                        <div class="mailbox-detail">
+                            <div class="mailbox-detail-header">
+                                <div class="d-flex">
+                                    <a href="#">
+                                        <img src="assets/img/user/user-1.jpg" alt="" width="40" class="rounded-circle">
+                                    </a>
+                                    <div class="flex-fill ms-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-fill">
+                                                <div class="fw-600">${notification.title}</div>
+                                                <div class="fs-13px">
+                                                    <span class="me-1">to</span> 
+                                                    <a href="#" class="text-decoration-none">[ ${notification.emailid}]</a>
+                                                </div>
+                                            </div>
+                                            <div class="fs-12px text-muted text-end">
+                                                ${formattedDate}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mailbox-detail-content">
+                                <h4 class="mb-3">${notification.title || 'Notification'}</h4>
+                                
+                                <div class="mailbox-detail-body">
+                                    ${notification.details || notification.message}
+                                </div>
+                                <br>
+                                <div class='mailbox-detail-footer mt-5'>
+                                    Thanks ,
+                                    Team Tasktrek
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                
+                container.html(content);
+            }
+
+            // Helper function for attachments
+            function renderAttachments(attachments) {
+                return `
+                    <div class="mailbox-detail-attachment">
+                        ${attachments.map(attach => `
+                            <div class="mailbox-attachment">
+                                <a href="${attach.url || '#'}">
+                                    <div class="document-file">
+                                        ${attach.type === 'image' ? 
+                                            `<img src="${attach.thumbnail || attach.url}" alt="${attach.name}">` : 
+                                            `<i class="fa ${getFileIcon(attach.type)}"></i>`
+                                        }
+                                    </div>
+                                    <div class="document-name">${attach.name}</div>
+                                </a>
+                            </div>
+                        `).join('')}
+                        <div class="mb-3">
+                            <a href="#" class="btn btn-rounded px-3 btn-sm bg-theme bg-opacity-10 text-theme fw-600">
+                                Download All
+                            </a>
+                        </div>
+                    </div>`;
+            }
+
+            // Helper function for file icons
+            function getFileIcon(type) {
+                const icons = {
+                    'pdf': 'fa-file-pdf',
+                    'image': 'fa-file-image',
+                    'video': 'fa-file-video',
+                    'audio': 'fa-file-audio',
+                    'archive': 'fa-file-archive',
+                    'default': 'fa-file'
+                };
+                return icons[type] || icons.default;
+            }
+
+        })
+    </script>
+{% endblock  %}

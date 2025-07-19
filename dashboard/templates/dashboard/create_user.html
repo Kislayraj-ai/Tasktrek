@@ -1,0 +1,119 @@
+{% extends "dashboard/layout/main.html" %}
+{% load static %}
+{% block 'title' %}Dashboard{% endblock  %}
+
+
+{% block  'content' %}
+<div class="container">
+   
+
+    <div class="row">
+        <div class="col">
+           <div class="card">
+             <div class="card-header">
+                 <h1>Add User</h1>
+             </div>
+            <div class="card-body p-5">
+                {% for m in messages %}
+                    {% if m.tags == "error" %}
+                        <div class="alert alert-danger">
+                    {% else %}
+                        <div class="alert alert-{{ m.tags }}">
+                    {% endif %}
+                        {{ m }}
+                    </div>
+                {% endfor %}
+
+
+                 <form action="{% url "submituserdata" %}" class="mainform" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+
+                    
+                        <div class="col-md-6">
+                            <label for="name">Username </label>
+                            <input type="text" class="form-control" placeholder="Enter Name" name="name"  required />
+                        </div>
+
+                        <div class="col-6 mt-2">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" placeholder="Enter Email"  name="email" required />
+                        </div>
+
+                        <div class="row mt-3 p-0">
+
+                            <div class="col-md-6">
+                                <label for="name">First Name </label>
+                                <input type="text" class="form-control" placeholder="Enter First Name" name="first_name"  required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="name">Last Name </label>
+                                <input type="text" class="form-control" placeholder="Enter Last Name" name="last_name"  required />
+                            </div>
+
+                        </div>
+
+                        <div class="col-6  mt-2">
+                            <label for="phone">Phone</label>
+                            <input type="text" class="form-control"  name="phone"  placeholder="Enter Phone" / >
+                        </div>
+                        
+                        <div class="col-6 mt-2">
+                            <label for="type">Type</label>
+                            <select name="type" class="form-select">
+                                    {% for r in roles %}
+                                        {% if user.myuserrole.role.id == 1 %}
+                                            <option value="{{ r.id }}">{{ r.name }}</option>
+                                        {% elif r.id != 1 and r.id != 2 %}
+                                            <option value="{{ r.id }}">{{ r.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            
+                        </div>   
+
+                        <div class="col-6  mt-2">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" placeholder="Enter Password" name="password"   required />
+                        </div>
+
+                        
+                        <div class="col-6  mt-2">
+                            <label for="image">Profile Img</label>
+                            <input type="file" class="form-control"  name="image" / >
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+            </form>
+            </div>
+           </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    
+  $(document).on('submit', '.mainform', function(e) {
+    e.preventDefault();
+    toggleLoader("show");
+
+    setTimeout(() => {
+      $(".mainform")[0].submit();
+    }, 2000);
+  });
+
+</script>
+
+
+{% endblock %}

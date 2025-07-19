@@ -1,0 +1,30 @@
+[
+  {
+    "model": "dashboard.role",
+    "pk": 1,
+    "fields": {
+      "name": "Admin"
+    }
+  },
+  {
+    "model": "dashboard.role",
+    "pk": 2,
+    "fields": {
+      "name": "Manager"
+    }
+  },
+  {
+    "model": "dashboard.role",
+    "pk": 3,
+    "fields": {
+      "name": "Member"
+    }
+  },
+  {
+    "model" : "dashboard.role",
+    "pk" : 4 ,
+    "fields" :{
+        "name" : "Viewer"
+    }
+   }
+]

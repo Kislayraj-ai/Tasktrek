@@ -1,0 +1,459 @@
+{% extends "dashboard/layout/main.html" %}
+
+{% load static %}
+{% block 'title' %}Add Task{% endblock %}
+
+{% block 'content' %}
+<div class="container-fluid py-4">
+
+
+    <!-- Team Members Table -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Task</h5>
+                <button class="btn btn-sm btn-light" id='addTaskBtn' data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                    <i class="fas fa-plus me-1"></i> Add Task
+                </button>
+            </div>
+        </div>
+
+        {% if  messages %}
+            {% for m  in messages %}
+                {% if m.tags == 'error' %}
+                    <div class="alert alert-danger">
+                {% else  %}
+                    <div class="alert alert-{{ m.tags }}">
+                {% endif %}
+                        {{m}}
+                    </div>
+            {% endfor %}
+        {% endif %}
+
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover"  id="projectTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Project</th>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Created at</th>
+
+                            {% if user.myuserrole.role.id == 1 %}
+                                <th>Action</th>
+                            {% endif %}
+                            
+                        </tr>
+                    </thead>
+                
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog" style="width: 90%; max-width: 90%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="addTaskForm" method="post" action="{% url "submittask" %}">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <!-- Project Selection (if needed) -->
+                        <div class="col-md-6">
+                            <label class="form-label">Project</label>
+                            <select name="project" id="project" class="form-select" required>
+                                <option value="">Select Project</option>
+                                    {% for pro  in project %}
+                                        <option value="{{pro.id}}">{{pro.name}}</option>
+                                    {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Assignee Selection -->
+                        <div class="col-md-6">
+                            <label for="assignee" class="form-label">Assignee*</label>
+                            <select name="assignee" id="assignee" class="form-select" required>
+                                <option value="">Select Member</option>
+                            </select>
+                        </div>
+
+                        <!-- Task Name -->
+                        <div class="col-md-6">
+                            <label for="task_name" class="form-label">Task Name*</label>
+                            <input type="text" class="form-control" id="task_name" name="task_name" required>
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="col-md-6">
+                            <label for="priority" class="form-label">Priority*</label>
+                            <select name="priority" id="priority" class="form-select" required>
+                                <option value="LW">Low</option>
+                                <option value="MM" selected>Medium</option>
+                                <option value="HH">High</option>
+                                <option value="CL">Critical</option>
+                            </select>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                        <!-- Deadline -->
+                        {% comment %} <div class="col-md-6">
+                            <label for="deadline" class="form-label">Deadline*</label>
+                            <input type="date" class="form-control" id="deadline" name="deadline" required>
+                        </div> {% endcomment %}
+
+                        <!-- Status -->
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" id="status" class="form-select" required>
+                                <option value="IP" selected>In Progress</option>
+                                <option value="CP">Hold</option>
+                                {% comment %} <option value="in_qa">In QA</option> {% endcomment %}
+                                <option value="HD">Completed</option>
+                            </select>
+                        </div>
+
+                        <!-- Hold Reason (Conditional) -->
+                        <div class="col-12" id="holdReasonContainer" style="display: none;">
+                            <label for="hold_reason" class="form-label">Hold Reason*</label>
+                            <input type="text" class="form-control" id="hold_reason" name="hold_reason">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="addTaskForm" class="btn btn-primary">Save Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% comment %} <script>
+    // Show/hide hold reason based on status selection
+    document.getElementById('status').addEventListener('change', function() {
+        const holdReasonContainer = document.getElementById('holdReasonContainer');
+        holdReasonContainer.style.display = this.value === 'hold' ? 'block' : 'none';
+        if (this.value === 'hold') {
+            document.getElementById('hold_reason').required = true;
+        } else {
+            document.getElementById('hold_reason').required = false;
+        }
+    });
+</script> {% endcomment %}
+
+<!-- SweetAlert JS -->
+ <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    
+  $(document).on('submit', '#addTaskForm', function(e) {
+    e.preventDefault();
+    toggleLoader("show");
+
+    setTimeout(() => {
+      $("#addTaskForm")[0].submit();
+    }, 2000);
+  });
+
+
+
+    
+$(document).ready(() => {
+
+
+        // here project on change
+        let projectDropdown = $('#project').select2({
+            placeholder: "Select Project",
+            width: '100%',
+            allowClear: true ,
+            dropdownParent: $('#addTaskModal')
+        });
+
+        let assigneeDropdown = $('#assignee').select2({
+            placeholder: "Select assignee",
+            width: '100%',
+            allowClear: true ,
+            dropdownParent: $('#addTaskModal')
+        });
+
+        projectDropdown.on('change' , (e)=>{
+
+           // console.log("changes " , $(e.target).val())
+            let projectid =  $(e.target).val() ;
+
+            $.ajax({
+                url: "{% url 'fetch_project_users_task' %}",
+                type: "GET",
+                data: {
+                    projectid: projectid
+                },
+                success: (data) => {
+                    // 1. Clear existing options
+                    assigneeDropdown.empty();
+
+                    assigneeDropdown.append(
+                        new Option("Select Assignee", "", false, false)
+                    );
+
+                    data.users.forEach((user) => {
+                        assigneeDropdown.append(
+                            new Option(
+                                `${user.username} (${user.email}) - ${user.role}`,
+                                user.userid,
+                                false,
+                                false
+                            )
+                        );
+                    });
+
+                    assigneeDropdown.trigger('change');
+                },
+                error: (err) => {
+                    console.error("Error fetching users:", err);
+                }
+            });
+
+        })
+        
+
+        let projectTable = $('#projectTable').DataTable() ;
+        function loadTask() {
+            $.ajax({
+                url: "{% url 'fetch_task' %}",
+                type: 'GET',
+                success: function (data) {
+                     //console.log("Data " , data)
+                    //return ;
+
+                    if (projectTable !== null) {
+                        projectTable.destroy();
+                        $('#projectTable tbody').empty();
+                    }
+                    projectTable = $('#projectTable').DataTable({
+                        data: data.alltask   ,
+                        columns: [
+                            { data: null ,
+                                render : function(data, type , row){
+                                    let url = `/dashboard/task-details/${row.id}`
+                                    return `
+                                            <a href='${url}' class='link'>${data.name}</a>
+                                    `
+                                }
+                            },
+                            { data: 'project_name' },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return row.username ?? 'N/A'
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function (data, type, row) {
+                                    return row.role ?? 'N/A'
+                                }
+                            },
+                            {
+                                data: 'priority',
+                                render: function(data) {
+                                    const priorityMap = {
+                                        'LW': ['Low', 'bg-info'],
+                                        'MM': ['Medium', 'bg-warning'],
+                                        'HH': ['High', 'bg-danger'],
+                                        'CL': ['Critical', 'bg-dark']
+                                    };
+                                    const [label, cls] = priorityMap[data] || [data, 'bg-secondary'];
+                                    return `<span class="badge ${cls}">${label}</span>`;
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function(data, type, row) {
+
+                                    const currentStatus = row.statusname || '';
+                                    // console.log("status " , row.status)
+                                    
+                                    return `
+                                        <select name="status" class="form-control status-select" data-row-id="${row.id}">
+                                            <option value="IP" ${currentStatus === 'IP' ? 'selected' : ''}>In Progress</option>
+                                            <option value="CP" ${currentStatus === 'CP' ? 'selected' : ''}>Completed</option>
+                                            <option value="HD" ${currentStatus === 'HD' ? 'selected' : ''}>Hold</option>
+                                        </select>
+                                    `;
+                                }
+                            },
+                            {
+                                data: null,
+                                render: function(data, type, row) {
+                                    if (!row.created_at) return 'N/A';
+                                    
+                                    const date = new Date(row.created_at);
+                                    const yyyy = date.getFullYear();
+                                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                                    const dd = String(date.getDate()).padStart(2, '0');
+                                    const hh = String(date.getHours()).padStart(2, '0');
+                                    const min = String(date.getMinutes()).padStart(2, '0');
+                                    // ${hh}:${min}
+                                    return `${yyyy}-${mm}-${dd} `;
+                                }
+                            }
+
+                            {% if user.myuserrole.role.id == 1 %}
+                                ,{
+                                    data: null,
+                                    render: function (data, type, row) {
+                                        return `
+                                            <div class="d-flex gap-1 align-item-center">
+                                                <button class='btn btn-danger btn-sm' data-id='${row.id}' id='removeTask' title='Remove Task'>
+                                                    <i class='fa fa-trash'></i>
+                                                </button>
+                                            </div>
+                                        `
+                                    }
+                                }
+                        {% endif %}
+
+                        ]
+                    });
+
+
+                    $(document).on('change', '.status-select', function() {
+                        const rowId = $(this).data('row-id');
+                        const newStatus = $(this).val();
+                        const csrfToken = "{{ csrf_token }}";
+
+                        $.ajax({
+                            url: "{% url 'update_task_status' %}",
+                            method: 'POST',
+                            data: {
+                                id: rowId,
+                                status: newStatus ,
+                                csrfmiddlewaretoken: csrfToken ,
+                            },
+                            success: function(response) {
+                                if(response.success){
+                                    alert('Task Status Updated');
+                                    return
+                                }else{
+                                    alert('Status not updated');
+                                    return
+                                }
+                            },
+                            error: function(xhr) {
+                                alert('Some Error Occurred');
+                            }
+                        });
+                    });
+
+
+
+                    $(document).on('click', '#removeTask', function(e) {
+                        e.preventDefault();
+                        const $button = $(this);
+                        const id = $button.data('id');
+                        const taskName = $button.data('task-name') || 'this task';
+                        const removeUrl = "{% url 'remove_task' %}";
+                        const token  = "{{ csrf_token }}"
+
+                        Swal.fire({
+                            title: 'Confirm Task Removal',
+                            html: `Are you sure you want to remove ?`,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Yes, remove it!',
+                            cancelButtonText: 'Cancel',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (!result.isConfirmed) return;
+
+                            $.ajax({
+                                url: removeUrl,
+                                type: "POST",
+                                data: {
+                                    id: id,
+                                    csrfmiddlewaretoken: token
+                                }
+                            })
+                            .done(function(data) {
+                                if (data.success) {
+                                    Swal.fire({
+                                        title: 'Deleted!',
+                                        text: data.msg || 'The task has been removed.',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        if (data.redirect) {
+                                            window.location.href = data.redirect;
+                                        } else {
+                                            location.reload();
+                                        }
+                                    });
+                                } else {
+                                    throw new Error(data.msg || 'Failed to remove task');
+                                }
+                            })
+                            .fail(function(jqXHR) {
+                                const errorMsg = jqXHR.responseJSON?.msg || jqXHR.statusText || 'An error occurred';
+                                Swal.fire(
+                                    'Error!',
+                                    errorMsg,
+                                    'error'
+                                );
+                            });
+                        });
+                    });
+                },
+                error: function () {
+                    //alert("Failed to load users");
+                }
+            });
+        }
+
+        loadTask()
+
+        
+
+
+    
+});
+
+
+
+</script>
+
+<style>
+    .card-header {
+        padding: 1rem 1.5rem;
+    }
+    .table th {
+        background-color: #f8f9fa;
+    }
+    .badge {
+        font-size: 0.85em;
+        padding: 0.35em 0.65em;
+    }
+</style>
+{% endblock %}
