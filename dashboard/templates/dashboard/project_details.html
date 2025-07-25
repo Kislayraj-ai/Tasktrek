@@ -43,10 +43,10 @@
                 <div class="col-md-6">
                     <p><strong>Project Name:</strong> {{ project.name }}</p>
                     <p><strong>Manager:</strong> {{ project.manager.username }}</p>
-                    <p><strong>Created At:</strong> {{ project.created_at|date:"M d, Y" }}</p>
+                    <p><strong>Created at:</strong> {{ project.created_at|date:"M d, Y" }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>deadline:</strong> 
+                    <p><strong>Deadline:</strong> 
                         <span class="{% if project.is_overdue %}text-danger{% endif %}">
                             {{ project.deadline|date:"M d, Y" }}
                             {% if project.is_overdue %}(Overdue){% endif %}
@@ -65,7 +65,21 @@
                         </span>
                         </p>
 
-                    <p><strong>Details:</strong> {{ project.details }}</p>
+                <div class="mb-3">
+                        <label class="form-label fw-bold"><strong>Doc File: </strong></label>
+                        {% if project.docfile %}
+                            <a href="{{ project.docfile.url }}" class="btn btn-outline-primary btn-sm ms-2" target="_blank">
+                                <i class="fa fa-file-alt me-1"></i> View Document
+                            </a>
+                        {% else %}
+                            <span class="text-muted ms-2">No file uploaded</span>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="col-md-12">
+                    <p><strong>Details:</strong> {{ project.details|safe }}</p>
                 </div>
             </div>
         </div>

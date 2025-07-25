@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'dashboard.middleware.authenticate.AuthMiddleware',
+    # 'dashbaord.middleware.redirection.Redirect'
 ]
 
 ROOT_URLCONF = 'Taskmanagement.urls'
@@ -78,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'taskmanagement',
         'USER': 'root',
-        'PASSWORD': '',  # WAMP me mostly blank hota hai
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3307',
     }

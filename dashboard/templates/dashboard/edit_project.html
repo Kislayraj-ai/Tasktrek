@@ -1,5 +1,5 @@
 {% extends "dashboard/layout/main.html" %}
-
+{% load static %}
 {% block 'title' %}Dashboard{% endblock  %}
 
 
@@ -25,7 +25,7 @@
                 {% endfor %}
 
 
-                 <form  method="POST">
+                 <form  method="POST"  enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
 
@@ -45,11 +45,6 @@
                             
                         </div>   
 
-                        <div class="col-6  mt-2">
-                            <label for="details">Details</label>
-                            <textarea  class='form-control' name="details" id="details" required row="3">{{pro.details}}</textarea>
-                        </div>
-
                         
                         <div class="col-6 mt-2">
                             <label for="deadline">Deadline</label>
@@ -63,6 +58,21 @@
                                 <option value="CP" {% if pro.status == 'CP'  %}selected{% endif %}>Completed</option>
                                 <option value="HD" {% if pro.status == 'HD'  %}selected{% endif %}>Hold</option>
                             </select>
+                        </div>
+
+
+                        
+                        <div class="col-6  mt-2">
+                            <label for="docfile">Doc File {% if pro.docfile  %}<span>(File already uploaded <a href="{{ pro.docfile.url}}" target='_blank'>
+                                <i class="fa fa-link"></i>
+                            </a> )</span>{% endif %}</label>
+                            <input type="file" name="docfile" id="docfile" class="form-control" >
+                        </div>
+                        
+                        
+                        <div class="col-6  mt-2">
+                            <label for="details">Details</label>
+                            <textarea  class='form-control' name="details" id="details" required row="3">{{pro.details|safe}}</textarea>
                         </div>
 
                         <div class="row mt-3">
@@ -81,5 +91,14 @@
     </div>
 
 </div>
+
+<script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
+<script>
+    $(document).ready(function() {
+		$('#details').summernote({
+			height: 300 
+		});
+	});
+</script>
 
 {% endblock %}

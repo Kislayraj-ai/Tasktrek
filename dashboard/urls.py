@@ -32,7 +32,7 @@ urlpatterns = [
 
 
     path('remove-project-memeber', views.removeProjectMemeber, name='remove_project_memeber'),
-    path('add-new-task', views.addNewTask, name='add_new_task'),
+    path('manage-task', views.addNewTask, name='add_new_task'),
     path('fetch-task', views.fetchTask, name='fetch_task'),
     path('fetch-project-users', views.fetchProjectUsers, name='fetch_project_users'),
     path('submit-task', views.submittask, name='submittask'),

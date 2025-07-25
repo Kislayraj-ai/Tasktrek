@@ -432,6 +432,7 @@ def submitProject(request):
                 manager =  request.POST.get('manager')
                 detail =  request.POST.get('details')
                 deadline =  request.POST.get('deadline')
+                docfile =  request.FILES.get('docfile')
 
                 user =  User.objects.get(id=manager)
 
@@ -441,6 +442,7 @@ def submitProject(request):
                 project.manager  = user 
                 project.details  = detail
                 project.deadline  = deadline
+                project.docfile =  docfile
 
                 project.save()
 
@@ -500,8 +502,8 @@ def submitProject(request):
         return redirect('addNewProject')
     
     except Exception as e:
-        print(f"Error {e}")
-        messages.error(request , "Some Error Occurred")
+
+        messages.error(request , f"Error {e}")
         return redirect('addNewProject')
 
 
@@ -636,6 +638,7 @@ def editProject(request , proid):
                 manager =  request.POST.get('manager')
                 detail =  request.POST.get('details')
                 deadline =  request.POST.get('deadline')
+                docfile =  request.FILES.get('docfile')
 
                 project =  Project.objects.get(id=proid)
                 project.name  = name
@@ -643,6 +646,9 @@ def editProject(request , proid):
                 project.manager  = User.objects.get(id=manager)
                 project.details  = detail
                 project.deadline  = deadline
+                
+                if docfile :
+                    project.docfile  = docfile
 
                 project.save()
 
@@ -1519,7 +1525,7 @@ def emailcompose(request):
 
                     html_content = f"""
                         <div style="font-family: Arial, sans-serif; padding: 10px; color: #333;">
-                            <p>{emailcontent}</p>
+                            {emailcontent}
                         </div>
                     """
                     send_custom_email(

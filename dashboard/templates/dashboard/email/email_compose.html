@@ -55,8 +55,8 @@
 				<div class="mailbox-body">
 					<div class="mailbox-content">
 						<!-- BEGIN scrollbar -->
-						<div data-scrollbar="true" data-height="100%" data-skip-mobile="true">
-							<div class="mailbox-form">
+						<div data-scrollbar="true" data-height="110%" data-skip-mobile="true">
+							<div class="mailbox-form p-3">
 								<form  method="POST" class='email_form' name="email_form" class="p-3">
 
 									{% csrf_token %}
@@ -99,7 +99,7 @@
 									<!-- Email Content -->
 									<div class="row mb-3">
 										<div class="col-12">
-											<textarea  rows="10" name="emailcontent" class="summernote form-control" title="Contents"></textarea>
+											<textarea  rows="10" name="emailcontent" class="form-control" title="Contents" id='summernote'></textarea>
 
 										</div>
 									</div>
@@ -126,14 +126,14 @@
 
 <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Bootstrap CSS -->
-    {% comment %} <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> {% endcomment %}
-
 
 <script>
-	
 
-
+	  $(document).ready(function() {
+			$('#summernote').summernote({
+				height: 300 
+			});
+		});
         $(document).ready(() =>{
 
 			  $(document).on('submit', '.email_form', function(e) {

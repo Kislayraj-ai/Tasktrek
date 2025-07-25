@@ -26,6 +26,8 @@ class Project(models.Model):
         choices=StatusPro.choices,
         default=StatusPro.IN_PROGRESS
     )
+    docfile =  models.FileField(upload_to="project/" , default='')
+    
     created_at =  models.DateTimeField(default=timezone.now)
 
 

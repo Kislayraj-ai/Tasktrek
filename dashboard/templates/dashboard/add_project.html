@@ -25,7 +25,7 @@
                 {% endfor %}
 
 
-                 <form action="{% url "submitProject" %}" method="POST" class="mainform">
+                 <form action="{% url "submitProject" %}" method="POST" class="mainform" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
 
@@ -35,7 +35,7 @@
                         </div>
                         
                         <div class="col-6 mt-2">
-                            <label for="manager">Maanger</label>
+                            <label for="manager">Manager</label>
                             <select name="manager" class="form-select" >
                                 {% for r in manager  %}
                                     <option value="{{r.id}}">{{ r.username }}</option>
@@ -45,17 +45,13 @@
                             
                         </div>   
 
-                        <div class="col-6  mt-2">
-                            <label for="details">Details</label>
-                            <textarea  class='form-control' name="details" id="details" required row="3"></textarea>
-                        </div>
-
                         
                         <div class="col-6  mt-2">
                             <label for="deadline">Deadline</label>
                             <input type="date" name="deadline" id="deadline" class="form-control" required >
                         </div>
-                        
+
+
                         <div class="col-6 mt-2">
                             <label for="status">Status</label>
                             <select name="status" id="status" class="form-control">
@@ -63,6 +59,17 @@
                                 <option value="CP">Completed</option>
                                 <option value="HD">Hold</option>
                             </select>
+                        </div>
+
+                        <div class="col-6  mt-2">
+                            <label for="docfile">Doc File</label>
+                            <input type="file" name="docfile" id="docfile" class="form-control" >
+                        </div>
+                        
+
+                        <div class="col-6  mt-3">
+                            <label for="details">Details</label>
+                            <textarea  class='form-control' name="details" id="details" required row="3"></textarea>
                         </div>
 
                         <div class="row mt-3">
@@ -84,6 +91,12 @@
 
 <script src="{% static 'assets/js/jquery-3.7.1.min.js' %}"></script>
 <script>
+
+    $(document).ready(function() {
+		$('#details').summernote({
+			height: 300 
+		});
+	});
     
   $(document).on('submit', '.mainform', function(e) {
     e.preventDefault();
